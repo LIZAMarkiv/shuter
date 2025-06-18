@@ -131,7 +131,7 @@ def start_game():
                     ufo.hitbox.y = -100
                     ufo.hitbox.x = random.randint(0,600)
                     destroyed_enemy+=1
-                   
+
 
 
                     break
