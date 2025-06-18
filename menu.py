@@ -1,5 +1,6 @@
 from PyQt6.QtWidgets import*
 from main import*
+from shop import*
 
 app = QApplication([])
 window = QWidget()
@@ -17,6 +18,7 @@ main_lain.addWidget(knopka4)
 
 window.setLayout(main_lain)
 knopka1.clicked.connect(start_game)
+knopka2.clicked.connect(shop_window)
 
 window.show()
 app.exec()

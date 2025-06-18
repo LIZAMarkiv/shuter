@@ -1,12 +1,16 @@
 import pygame
 import random
-
+from helper import*
+from shop import*
 
 destroyed_enemy = 0
 missed_enemy = 0
 
 def start_game():
     global missed_enemy,destroyed_enemy
+    data = read_file()
+    save_file(data)
+
     pygame.init()
     class OurClass():
         def __init__(self,x,y,speed,texture,w,h):
@@ -58,8 +62,28 @@ def start_game():
 
 
     class Asteroid(OurClass):
+        global missed_enemy
+
+        def __init__(self, x, y, texture, speed, w, h):
+            self.direction = "forward"
+            self.texture = pygame.image.load(texture)
+            self.texture = pygame.transform.scale(self.texture, [w, h])
+            self.hitbox = self.texture.get_rect()
+            self.x = x
+            self.y = y
+            self.speed = speed
+
+        def draw(self, window):
+            window.blit(self.texture, self.hitbox)
+
         def update(self):
-            pass
+            global missed_enemy
+            self.hitbox.y += self.speed
+            if self.hitbox.y > 500:
+                self.hitbox.y = -100
+                self.hitbox.x = random.randint(1, 600)
+                missed_enemy += 1
+
 
     class Ufo():
         global missed_enemy
@@ -96,12 +120,14 @@ def start_game():
 
 
     rocket = Rocket(300,380,5,"rocket (1).png",80,110)
-    asteroid = Asteroid(500,200,0,"asteroid (1).png",50,50)
+
     ufos = []
-    for i in range(15):
+    for i in range(10):
        ufos.append(Ufo(random.randint(10,600),random.randint(-100,200),"ufo (1).png",5,50,50))
 
-
+    asteroids = []
+    for a in range(5):
+        asteroids.append(Asteroid(random.randint(10,600),random.randint(-100,200),"asteroid (1).png",5,50,50))
 
 
 
@@ -110,7 +136,7 @@ def start_game():
     pygame.mixer.music.play(-1)
     pygame.mixer.music.set_volume(2)
 
-    ufo_song =  pygame.mixer.Sound("ufo (1).ogg")
+    fire = pygame.mixer.Sound("fire (1).ogg")
 
     background_img = pygame.image.load("galaxy (1).jpg")
     background_img = pygame.transform.scale(background_img, [700,500])
@@ -123,6 +149,8 @@ def start_game():
                 pygame.quit()
                 exit()
 
+        fire.play()
+
 
         for ballet in rocket.ballets[:]:
             for ufo in ufos[:]:
@@ -132,13 +160,23 @@ def start_game():
                     ufo.hitbox.x = random.randint(0,600)
                     destroyed_enemy+=1
 
-
-
+                    data = read_file()
+                    data["money"] += 1
+                    save_file(data)
                     break
 
+        for ballet in rocket.ballets[:]:
+            for asteroid in asteroids[:]:
+                if ballet.hitbox.colliderect(asteroid.hitbox):
+                    rocket.ballets.remove(ballet)
+                    asteroid.hitbox.y = -100
+                    asteroid.hitbox.x = random.randint(0, 600)
+                    destroyed_enemy += 1
+                    data = read_file()
+                    data["money"] += 1
+                    save_file(data)
 
-
-
+                    break
 
 
         destroyed_text = pygame.font.Font(None, 20).render("Знищено:" + str(destroyed_enemy), True, [0, 255, 255])
@@ -146,12 +184,13 @@ def start_game():
         window.blit(background_img, [0, 0])
         rocket.update()
         rocket.draw(window)
-        asteroid.draw(window)
         window.blit(destroyed_text,[0,0])
         window.blit(missed_text, [0, 20])
         for u in ufos:
             u.update()
             u.draw(window)
-
+        for t in asteroids:
+            t.update()
+            t.draw(window)
         pygame.display.flip()
         clock.tick(60)
