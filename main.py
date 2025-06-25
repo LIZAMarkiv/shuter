@@ -1,5 +1,6 @@
 import pygame
 import random
+import time
 from helper import*
 from shop import*
 
@@ -97,6 +98,7 @@ def start_game():
             self.speed = speed
 
 
+
         def draw (self,window):
             window.blit(self.texture, self.hitbox)
 
@@ -110,6 +112,24 @@ def start_game():
 
 
 
+    class Moneta():
+        def __init__(self, x, y, texture, speed, w, h):
+            self.texture = pygame.image.load(texture)
+            self.texture = pygame.transform.scale(self.texture, [w, h])
+            self.hitbox = self.texture.get_rect()
+            self.x = x
+            self.y = y
+            self.speed = speed
+
+        def draw(self, window):
+            window.blit(self.texture, self.hitbox)
+
+
+        def update(self):
+            self.hitbox.y += self.speed
+            if self.hitbox.y > 500:
+                self.hitbox.y = -100
+                self.hitbox.x = random.randint(1,600)
 
 
 
@@ -129,6 +149,9 @@ def start_game():
     for a in range(5):
         asteroids.append(Asteroid(random.randint(10,600),random.randint(-100,200),"asteroid (1).png",5,50,50))
 
+    monetas = []
+    for m in range(3):
+        monetas.append(Moneta(random.randint(10,600),-100,"image-removebg-preview (1).png",5,40,40))
 
 
     pygame.mixer.init()
@@ -143,6 +166,8 @@ def start_game():
     window = pygame.display.set_mode([700,500])
     clock = pygame.time.Clock()
     game = True
+    start_time = 0
+    speed_efect = False
     while game:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -177,6 +202,26 @@ def start_game():
                     save_file(data)
 
                     break
+        for monet in monetas[:]:
+            if monet.hitbox.colliderect(rocket.hitbox):
+                for asteroid in asteroids:
+                    asteroid.speed = 3
+                for ufo in ufos:
+                    ufo.speed = 3
+                    speed_efect = True
+                    start_time = time.time()
+
+                monetas.remove(monet)
+
+        if speed_efect == True:
+            if time.time() - start_time > 15:
+                speed_efect = False
+                for asteroid in asteroids:
+                    asteroid.speed = 5
+                for ufo in ufos:
+                    ufo.speed =5
+
+
 
 
         destroyed_text = pygame.font.Font(None, 20).render("Знищено:" + str(destroyed_enemy), True, [0, 255, 255])
@@ -184,6 +229,10 @@ def start_game():
         window.blit(background_img, [0, 0])
         rocket.update()
         rocket.draw(window)
+        for i in monetas:
+            i.update()
+            i.draw(window)
+
         window.blit(destroyed_text,[0,0])
         window.blit(missed_text, [0, 20])
         for u in ufos:
