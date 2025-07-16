@@ -3,5 +3,9 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.12 (shuter)" />
   </component>
+<<<<<<< HEAD
   <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.13 (shuter)" project-jdk-type="Python SDK" />
+=======
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.11 (shuter)" project-jdk-type="Python SDK" />
+>>>>>>> 8b9d00b97a7d51f97afe2b16bc9fc528e369b6ac
 </project>
