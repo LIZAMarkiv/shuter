@@ -1,6 +1,4 @@
 from PyQt6.QtWidgets import*
-from main import*
-from shop import*
 
 app = QApplication([])
 window = QWidget()
